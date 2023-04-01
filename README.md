@@ -1,7 +1,5 @@
 # Elevator System
 
-# Elevator System
-
 Implemented the business logic for simplified elevator system in Python and created APIs for following features:
 
 - Initialise the elevator system to create ‘n’ elevators in the system
@@ -11,6 +9,12 @@ Implemented the business logic for simplified elevator system in Python and crea
 - Saves user request to the list of requests for a elevator
 - Mark a elevator as not working or in maintenance 
 - Open/close the door.
+
+## Project Structure
+- Inside project directory, created an django app named elevator.
+- Inside elevator app, in `urls.py` file mentioned all the api endpoints and their corresponding views methods. 
+- All Views methods are present in `views.py` file. 
+- In `lib.py` file, the Elevator and ElevatorSystem classes are present with all their required attributes and methods.
 
 ## Elevator Design
 - ElevatorSystem: Represents the elevator system with fixed numbers of elevators avaialbel, floors allowed and resposible for allocating the active floor number to each closest available lift.
