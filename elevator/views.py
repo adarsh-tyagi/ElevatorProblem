@@ -24,11 +24,11 @@ def home(request):
 def createElevatorSystem(request):
     if request.method == 'POST':
         numLifts = int(request.POST.get('numLifts', 5))
+        maxFloor = int(request.POST.get('maxFloor', 5))
         requestQueue = request.POST.get('requestQueue', [[]]*numLifts)
         liftPositions = request.POST.get('liftPositions', [])
 
         minFloor = 0
-        maxFloor = numLifts-1
         global elevatorSystem
         elevatorSystem = ElevatorSystem(numberOfLifts=numLifts, minFloor=minFloor, maxFloor=maxFloor, requestQueueForEach=requestQueue, liftPositions=liftPositions)
         return JsonResponse({'message': f"Elevator system with {numLifts} number of lifts is initialized "})
@@ -89,7 +89,7 @@ def saveElevatorRequests(request):
     if request.method == 'POST':
         elevatorId = request.POST.get('id', None)
         floorNumber = request.POST.get('floor', None)
-        if not elevatorId or int(elevatorId) > len(elevatorSystem.elevators) or not floorNumber:
+        if not elevatorId or int(elevatorId) > len(elevatorSystem.elevators) or not floorNumber or int(floorNumber) > elevatorSystem.maxFloor:
             return JsonResponse({'message': 'Please give the valid elevator id and floor number'})
         if not elevatorSystem:
             return JsonResponse({'message': 'No elevator system exists currently'})
@@ -102,14 +102,18 @@ def saveElevatorRequests(request):
 def changeElevatorStatus(request):
     if request.method == 'POST':
         elevatorId = request.POST.get('id', None)
-        status = request.POST.get('status', False)
+        status = request.POST.get('status', None)
         if not elevatorId or int(elevatorId) > len(elevatorSystem.elevators) or not status:
             return JsonResponse({'message': 'Please give the valid elevator id and status both to change its status'})
         if not elevatorSystem:
             return JsonResponse({'message': 'No elevator system exists currently'})
 
         currentElevator = elevatorSystem.elevators[int(elevatorId)]
-        currentElevator.isWorking = status
+        if status in ('not working', 'maintenance'):
+            curr_status = False
+        else:
+            curr_status = True
+        currentElevator.isWorking = curr_status
         return JsonResponse({'message': f'Status of Elevator id {elevatorId} is updated.'})
 
 
