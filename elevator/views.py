@@ -27,10 +27,17 @@ def createElevatorSystem(request):
         maxFloor = int(request.POST.get('maxFloor', 5))
         requestQueue = request.POST.get('requestQueue', [[]]*numLifts)
         liftPositions = request.POST.get('liftPositions', [])
+        activeFloors = request.POST.get('activeFloors', [])
+        print("active floors", activeFloors)
+        if len(activeFloors):
+            activeFloors = [int(i) for i in activeFloors.split(",")]
+        if len(liftPositions):
+            liftPositions = [int(i) for i in liftPositions.split(",")]
 
         minFloor = 0
         global elevatorSystem
         elevatorSystem = ElevatorSystem(numberOfLifts=numLifts, minFloor=minFloor, maxFloor=maxFloor, requestQueueForEach=requestQueue, liftPositions=liftPositions)
+        elevatorSystem.processRequest(activeFloors=activeFloors)
         return JsonResponse({'message': f"Elevator system with {numLifts} number of lifts is initialized "})
 
 @api_view(['GET'])
@@ -95,8 +102,10 @@ def saveElevatorRequests(request):
             return JsonResponse({'message': 'No elevator system exists currently'})
 
         currentElevator = elevatorSystem.elevators[int(elevatorId)]
-        currentElevator.services.append(floorNumber)
-        return JsonResponse({'message': f'Elevator id {elevatorId} requests are updated. New requests are: {currentElevator.services}'})
+        currentElevator.services.append(int(floorNumber))
+        message = f'Elevator id {elevatorId} requests are updated. Floors queue: {currentElevator.services}'
+        currentElevator.requestsProcessing()
+        return JsonResponse({'message': message})
 
 @api_view(['POST'])
 def changeElevatorStatus(request):

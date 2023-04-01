@@ -25,10 +25,9 @@ class Elevator:
         if self.isWorking:
             if self.isMoving:
                 direction = 'up' if self.direction == 1 else 'down'
-                message = f"{self.liftId} is moving {direction}wards."
+                message = f"Lift {self.liftId} is on floor number {self.onFloor}. Lift {self.liftId} is moving {direction}wards."
             else:
-                message = f"{self.liftId} is not moving."
-            message += f" Lift is on floor number {self.onFloor}"
+                message = f"Lift {self.liftId} is stopped."
             print(message)
         else:
             print(f"{self.liftId} is not working")
@@ -66,8 +65,12 @@ class Elevator:
 
     # process the up and down lists after processing the first value of services list
     def requestsProcessing(self):
-        print(f"{self.liftId} is processing: {self.services}")
+        print(f"{self.liftId} is processing these floors: {self.services}")
         if self.services[0] != self.onFloor:
+            if self.services[0] < self.onFloor:
+                self.direction = -1
+            else:
+                self.direction = 1
             self.currentStatus()
             self.executeRequest(self.services[0:1])
         else:
@@ -89,13 +92,14 @@ class Elevator:
             else:
                 self.direction = 1
         
-        for i in range(2):
-            if self.direction == 1:
-                self.executeRequest(upDirectionServices)
-            else:
-                self.executeRequest(downDirectionServices)
-            
-            self.direction = -self.direction
+            for i in range(2):
+                if self.direction == 1:
+                    self.executeRequest(upDirectionServices)
+                else:
+                    self.executeRequest(downDirectionServices)
+                
+                self.direction = -self.direction
+                print("-"*30)
         
         self.resetLift()
     
@@ -113,11 +117,9 @@ class Elevator:
             if self.onFloor in requestList:
                 while requestList.count(self.onFloor) > 0:
                     requestList.remove(self.onFloor)
-            
-            self.isMoving = False
-            self.currentStatus()
-            self.openDoor()
-            self.closeDoor()
+                self.isMoving = False
+                self.openDoor()
+                self.closeDoor()
 
             if len(requestList) == 0:
                 break
@@ -181,6 +183,6 @@ class ElevatorSystem:
         # processing the each elevators services list (floor numbers list)
         for elevator in self.elevators:
             if elevator.isSelected:
-                print("********************************")
-                print(f"Lift Number: {elevator.lifeId}")
-                print(elevator.executeRequest())
+                print("*"*50)
+                print(f"Lift Number: {elevator.liftId}")
+                print(elevator.requestsProcessing())
